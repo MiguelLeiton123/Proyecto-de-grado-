@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prototipo - Panel de objetos abandonados</title>
+<style>
+:root{--bg:#F3F5F8;--surf:#FFFFFF;--ink:#1B2430;--mut:#5B6675;--line:#D5DBE3;--brand:#1F4E79;--brandtx:#FFFFFF;--amb:#9A5B00;--ambbg:#FFF1D6;--ok:#1E6B3A;--okbg:#E3F3E8;--bad:#A3241B;--badbg:#FBE4E1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F141B;--surf:#18202A;--ink:#E7ECF2;--mut:#9AA6B5;--line:#2C3745;--brand:#6FA8DC;--brandtx:#0F141B;--amb:#F2B65C;--ambbg:#3A2C10;--ok:#74C48C;--okbg:#13301D;--bad:#F08A80;--badbg:#3B1815}}
+:root[data-theme="dark"]{--bg:#0F141B;--surf:#18202A;--ink:#E7ECF2;--mut:#9AA6B5;--line:#2C3745;--brand:#6FA8DC;--brandtx:#0F141B;--amb:#F2B65C;--ambbg:#3A2C10;--ok:#74C48C;--okbg:#13301D;--bad:#F08A80;--badbg:#3B1815}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+.demo{background:var(--ambbg);color:var(--amb);padding:6px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+#login{max-width:380px;margin:9vh auto;padding:28px;background:var(--surf);border:1px solid var(--line);border-radius:10px}
+#login h1{font-size:21px;margin:0 0 4px}#login p{color:var(--mut);margin:0 0 18px;font-size:14px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.btn{border:1px solid var(--brand);background:var(--brand);color:var(--brandtx);padding:8px 14px;border-radius:6px;cursor:pointer}
+.btn.sec{background:transparent;color:var(--brand)}.btn.ok{background:var(--ok);border-color:var(--ok);color:var(--surf)}.btn.bad{background:var(--bad);border-color:var(--bad);color:var(--surf)}
+.btn:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#app{display:none;min-height:100vh}
+.top{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:var(--surf);border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}
+.top b{font-size:16px}nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;color:var(--mut)}nav button.on{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--brand)}
+main{max-width:1080px;margin:0 auto;padding:18px}
+.hu{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+h2{font-size:19px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.alert{display:flex;gap:12px;padding:12px;background:var(--surf);border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:8px;margin-bottom:10px;cursor:pointer;width:100%;text-align:left}
+.alert.sel{outline:2px solid var(--brand)}.thumb{width:84px;height:62px;border-radius:6px;background:var(--bg);border:1px solid var(--line);flex:none}
+.alert h3{margin:0;font-size:15px}.meta{color:var(--mut);font-size:13px}
+.chip{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px}.p{background:var(--ambbg);color:var(--amb)}.a{background:var(--okbg);color:var(--ok)}.f{background:var(--badbg);color:var(--bad)}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:16px}
+.big{width:100%;height:170px;border-radius:6px;background:var(--bg);border:1px solid var(--line);margin:10px 0}
+dl{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;margin:8px 0;font-size:14px}dt{color:var(--mut)}dd{margin:0}
+.note{font-size:13px;color:var(--mut)}.empty{color:var(--mut);padding:24px;text-align:center;border:1px dashed var(--line);border-radius:8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}.kpi{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:10px 12px}.kpi b{display:block;font-size:22px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--surf);font-size:14px}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--mut);font-weight:600;font-size:13px}
+.filters{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.filters select{width:auto}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:2px}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;display:none;z-index:9}
+</style>
+</head>
+<body>
+<div class="demo">Prototipo navegable con datos ficticios. No procesa video real. Trabajo de Grado I, corte 2.</div>
+
+<section id="login">
+  <h1>Alertas de objetos abandonados</h1>
+  <p>Laboratorio de Cómputo 2 <span class="hu">RNF-05</span></p>
+  <label for="em">Correo</label><input id="em" value="seguridad@prueba.local" autocomplete="off">
+  <label for="pw">Contraseña</label><input id="pw" type="password" value="Prueba#2026">
+  <div class="err" id="lerr"></div>
+  <div class="row"><button class="btn" id="bseg">Entrar como seguridad</button><button class="btn sec" id="badm">Entrar como administrador</button></div>
+  <p class="note" style="margin-top:14px">En el sistema real el perfil lo determina la cuenta; aquí se elige para demostrar los permisos. Tras 5 intentos fallidos la cuenta se bloquea temporalmente.</p>
+</section>
+
+<div id="app">
+  <header class="top"><div><b>Alertas de objetos abandonados</b> <span class="note" id="who"></span></div>
+    <nav id="nav"></nav><button class="btn sec" id="out">Salir</button></header>
+  <main id="main"></main>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const OBJ={maletin:'Maletín',portatil:'Computador portátil'};
+let rol=null,view='panel',sel=null,nextId=13;
+let ev=[
+ {id:12,o:'maletin',cam:'Domo entrada',h:'08:11',c:.77,e:'pendiente',lat:null},
+ {id:11,o:'portatil',cam:'Domo esquina',h:'08:10',c:.95,e:'pendiente',lat:2},
+ {id:10,o:'maletin',cam:'Domo esquina',h:'08:09',c:.81,e:'pendiente',lat:2},
+ {id:9,o:'portatil',cam:'Domo entrada',h:'16:41',c:.87,e:'atendida',lat:3},
+ {id:8,o:'maletin',cam:'Domo esquina',h:'13:06',c:.72,e:'falso_positivo',lat:2},
+ {id:7,o:'portatil',cam:'Domo esquina',h:'11:21',c:.90,e:'atendida',lat:1}];
+let cfg={t:60,c:.5,d:150,r:8}, aud=[];
+const lbl={pendiente:'Pendiente',atendida:'Atendida',falso_positivo:'Falso positivo'},cls={pendiente:'p',atendida:'a',falso_positivo:'f'};
+function svg(o){const w=o==='maletin'?'<rect x="22" y="22" width="40" height="28" rx="3" fill="#8794A6"/><rect x="34" y="15" width="16" height="8" rx="2" fill="none" stroke="#8794A6" stroke-width="3"/>':'<rect x="24" y="16" width="36" height="24" rx="2" fill="#8794A6"/><rect x="18" y="41" width="48" height="5" rx="2" fill="#8794A6"/>';return `<svg viewBox="0 0 84 62" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${w}</svg>`}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
+function go(v){view=v;sel=v==='panel'?sel:null;render()}
+function login(r){const em=$('#em').value.trim(),pw=$('#pw').value;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)||!pw){$('#lerr').textContent='Credenciales inválidas.';return}
+  rol=r;$('#login').style.display='none';$('#app').style.display='block';view='panel';render()}
+function render(){
+  $('#who').textContent='· '+(rol==='admin'?'Administrador':'Personal de seguridad');
+  const items=[['panel','Panel de alertas'],['hist','Historial']];if(rol==='admin')items.push(['cfg','Configuración']);
+  $('#nav').innerHTML=items.map(([k,t])=>`<button class="${view===k?'on':''}" data-v="${k}">${t}</button>`).join('');
+  $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  $('#main').innerHTML=view==='panel'?panel():view==='hist'?hist():conf();
+  bind()}
+function panel(){const pend=ev.filter(x=>x.e==='pendiente');
+  const list=pend.length?pend.map(x=>`<button class="alert ${sel===x.id?'sel':''}" data-id="${x.id}"><div class="thumb">${svg(x.o)}</div><div><h3>${OBJ[x.o]}</h3><div class="meta">Laboratorio de Cómputo 2 · ${x.cam}</div><div class="meta">Hoy ${x.h} · confianza ${Math.round(x.c*100)} %</div></div></button>`).join(''):'<div class="empty">No hay alertas pendientes.</div>';
+  const x=ev.find(v=>v.id===sel);
+  const det=x?`<div class="card"><h2 style="margin:0">Alerta #${x.id} <span class="chip ${cls[x.e]}">${lbl[x.e]}</span></h2><div class="big">${svg(x.o)}</div><p class="note" style="margin:0">Recorte del objeto; las personas se difuminan antes de guardar la imagen.</p>
+   <dl><dt>Objeto</dt><dd>${OBJ[x.o]}</dd><dt>Zona</dt><dd>Laboratorio de Cómputo 2</dd><dt>Cámara</dt><dd>${x.cam}</dd><dt>Hora</dt><dd>Hoy ${x.h}</dd><dt>Notificado en</dt><dd>${x.lat==null?'—':x.lat+' s tras confirmar'}</dd></dl>
+   ${rol==='seguridad'?`<div class="row"><button class="btn ok" data-s="atendida">Marcar atendida</button><button class="btn bad" data-s="falso_positivo">Falso positivo</button></div>`:'<p class="note">El administrador consulta las alertas en modo lectura; solo el personal de seguridad cambia su estado.</p>'}</div>`
+   :'<div class="empty">Selecciona una alerta para ver el detalle.</div>';
+  return `<h2>Alertas pendientes <span class="hu">HU-03</span><span class="hu">HU-06</span></h2><div class="row" style="margin:0 0 12px"><button class="btn sec" id="sim">Simular nueva alerta</button><span class="note" style="align-self:center">Demostración de la llegada en tiempo real (SSE).</span></div><div class="grid"><div>${list}</div><div>${det}</div></div>`}
+function hist(){const fe=window._fe||'',done=ev.filter(x=>x.e!=='pendiente');
+  const rows=ev.filter(x=>!fe||x.e===fe).map(x=>`<tr><td>#${x.id}</td><td>Hoy ${x.h}</td><td>Cómputo 2 / ${x.cam}</td><td>${OBJ[x.o]}</td><td><span class="chip ${cls[x.e]}">${lbl[x.e]}</span></td><td>${x.lat==null?'—':x.lat+' s'}</td></tr>`).join('');
+  const fp=done.length?Math.round(100*done.filter(x=>x.e==='falso_positivo').length/done.length):0,l=ev.filter(x=>x.lat!=null),lm=l.length?(l.reduce((a,b)=>a+b.lat,0)/l.length).toFixed(1):'—';
+  return `<h2>Historial y métricas <span class="hu">HU-05</span><span class="hu">HU-06</span></h2><div class="kpis"><div class="kpi">Total de eventos<b>${ev.length}</b></div><div class="kpi">Falsos positivos (revisadas)<b>${fp} %</b></div><div class="kpi">Latencia media<b>${lm} s</b></div></div>
+  <div class="filters"><select id="fe" aria-label="Filtrar por estado"><option value="">Todos los estados</option>${Object.keys(lbl).map(k=>`<option value="${k}" ${fe===k?'selected':''}>${lbl[k]}</option>`).join('')}</select></div><div class="tw"><table><thead><tr><th>ID</th><th>Fecha y hora</th><th>Zona / cámara</th><th>Objeto</th><th>Estado</th><th>Latencia</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Sin resultados.</td></tr>'}</tbody></table></div>`}
+function conf(){return `<h2>Configuración de la zona <span class="hu">HU-04</span><span class="hu">RNF-04</span></h2><div class="grid"><div class="card"><dl style="grid-template-columns:1fr"></dl>
+  <label for="ct">Tiempo de abandono (segundos, 5 a 3600)</label><input id="ct" type="number" value="${cfg.t}">
+  <label for="cc">Confianza mínima (0 a 1)</label><input id="cc" type="number" step="0.05" value="${cfg.c}">
+  <label for="cd">Distancia a persona (píxeles)</label><input id="cd" type="number" value="${cfg.d}">
+  <label for="cr">Retención de imágenes (días, 1 a 8)</label><input id="cr" type="number" value="${cfg.r}">
+  <div class="err" id="cerr"></div><div class="row"><button class="btn" id="save">Guardar cambios</button></div></div>
+  <div class="card"><b>Registro de auditoría</b><p class="note">Cada cambio queda registrado y no puede modificarse.</p>${aud.length?aud.map(a=>`<p style="margin:6px 0;font-size:14px">${a}</p>`).join(''):'<p class="note">Sin cambios en esta sesión.</p>'}</div></div>`}
+function bind(){
+  document.querySelectorAll('.alert').forEach(b=>b.onclick=()=>{sel=+b.dataset.id;render()});
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const x=ev.find(v=>v.id===sel);x.e=b.dataset.s;toast('Alerta #'+x.id+' marcada: '+lbl[x.e].toLowerCase());sel=null;render()});
+  const s=$('#sim');if(s)s.onclick=()=>{const o=Math.random()<.5?'maletin':'portatil',n=new Date(),h=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');ev.unshift({id:nextId++,o,cam:'Domo esquina',h,c:.9,e:'pendiente',lat:2+Math.floor(Math.random()*4)});toast('Nueva alerta: '+OBJ[o].toLowerCase());render()};
+  const f=$('#fe');if(f)f.onchange=()=>{window._fe=f.value;render()};
+  const sv=$('#save');if(sv)sv.onclick=()=>{const t=+$('#ct').value,c=+$('#cc').value,d=+$('#cd').value,r=+$('#cr').value;let m='';
+    if(!(t>=5&&t<=3600))m='El tiempo de abandono debe estar entre 5 y 3600 s.';else if(!(c>0&&c<=1))m='La confianza debe ser mayor que 0 y hasta 1.';else if(!(d>0))m='La distancia debe ser positiva.';else if(!(r>=1&&r<=8))m='La retención máxima permitida es de 8 días (RNF-04).';
+    $('#cerr').textContent=m;if(m)return;aud.unshift(`Hoy: tiempo ${cfg.t}→${t} s; confianza ${cfg.c}→${c}; retención ${cfg.r}→${r} d`);cfg={t,c,d,r};toast('Configuración guardada y auditada');render()}}
+$('#bseg').onclick=()=>login('seguridad');$('#badm').onclick=()=>login('admin');
+$('#out').onclick=()=>{rol=null;$('#app').style.display='none';$('#login').style.display='block'};
+</script>
+</body>
+</html>
